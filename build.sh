@@ -41,6 +41,7 @@ clean() {
     cleanf $name.a
     cleanf $name.so
     cleanf $name.dylib
+    return 0
 }
 
 case "$1" in
