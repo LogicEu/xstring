@@ -26,19 +26,6 @@ and useful operations.
 #define MAX(a, b) ((a) * ((a) >= (b)) + (b) * ((b) > (a)))
 #define getcount(arr) (sizeof(arr) / sizeof(arr[0]))
 
-#define funcdef(x) do { x } while(0)
-#define eatchar(str, c, i)          \
-funcdef                             \
-(                                   \
-    size_t bytes;                   \
-    while (str[i] == c) {           \
-        bytes = x_utf_bytes(str[i]);\
-        i += bytes;                 \
-    }                               \
-    i -= bytes;                     \
-)
-
-
 /* main string functions and operations */
 
 bool x_strcmp(const char* str1, const char* str2);
@@ -54,6 +41,7 @@ size_t x_strnum_first(const char* str);
 size_t x_strstr(const char* big, const char* little);
 size_t x_strchr(const char* str, const char* ch);
 size_t x_strcnt(const char* search, const char* find);
+size_t x_strscnt(char** strs);
 size_t x_strmatch(const char* str, char** keywords, const size_t count);
 size_t x_strmatch_sub(const char* str, char** keywords, const size_t count);
 
@@ -63,18 +51,18 @@ char* x_strget_num(const char* str);
 char* x_strget_reverse(const char* str);
 char* x_strget_strip(const char* str);
 char* x_strget_sweep(const char* str);
-char* x_strget_compose(char** strs, const size_t count);
+char* x_strget_compose(char** strs);
 
-char** x_strget_split(const char* str, size_t* count, const char* c);
-char** x_strget_words(const char* str, size_t* count);
-char** x_strget_symbols(const char* str, size_t* count);
-char** x_strget_tokens(const char* str, size_t* count);
-char** x_strget_variations(const char* str, size_t* count);
-char** x_strget_decompose(const char* str, size_t* count);
-char** x_strget_divide(const char* str, size_t* count, char** symbols, const size_t symbol_count);
-char** x_strget_merge(char** strs1, char** strs2, const size_t count1, const size_t count2, size_t* out_count);
-char** x_strget_group(const char* str, size_t* count, char** words, char** symbols, const size_t word_count, const size_t symbol_count);
-void x_strget_free(char** strs, const size_t count);
+char** x_strget_split(const char* str, const char* ch);
+char** x_strget_words(const char* str);
+char** x_strget_symbols(const char* str);
+char** x_strget_tokens(const char* str);
+char** x_strget_variations(const char* str);
+char** x_strget_decompose(const char* str);
+char** x_strget_divide(const char* str, char** symbols);
+char** x_strget_merge(char** strs1, char** strs2);
+char** x_strget_group(const char* str, char** words, char** symbols);
+void x_strget_free(char** strs);
 
 /* string operatons */
 

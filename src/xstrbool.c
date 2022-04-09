@@ -225,28 +225,31 @@ bool x_strbool_match_pattern(const char* restrict str, const char* restrict ref)
 {
     if (NULLSTR(str) || NULLSTR(ref)) return false;
 
-    size_t strcount, refcount, symcount;
+    //size_t strcount, refcount, symcount;
     
-    char** symbs = x_strget_symbols(ref, &symcount);
+    char** symbs = x_strget_symbols(ref);
     if (!symbs) return false;
 
-    char** refs = x_strget_divide(ref, &refcount, symbs, symcount);
+    char** refs = x_strget_divide(ref, symbs);
     if (!refs) {
-        x_strget_free(symbs, symcount);
+        x_strget_free(symbs);
         return false;
     }
 
-    char** strs = x_strget_divide(str, &strcount, symbs, symcount);
+    char** strs = x_strget_divide(str, symbs);
     if (!strs) {
-        x_strget_free(symbs, symcount);
-        x_strget_free(refs, refcount);
+        x_strget_free(symbs);
+        x_strget_free(refs);
         return false;
     }
+
+    const size_t strcount = x_strscnt(strs);
+    const size_t refcount = x_strscnt(refs);
     
     if (strcount < refcount) {
-        x_strget_free(symbs, symcount);
-        x_strget_free(refs, refcount);
-        x_strget_free(strs, strcount);
+        x_strget_free(symbs);
+        x_strget_free(refs);
+        x_strget_free(strs);
         return false;
     }
 
@@ -270,9 +273,9 @@ bool x_strbool_match_pattern(const char* restrict str, const char* restrict ref)
         }
     }
 
-    x_strget_free(strs, strcount);
-    x_strget_free(refs, refcount);
-    x_strget_free(symbs, symcount);
+    x_strget_free(strs);
+    x_strget_free(refs);
+    x_strget_free(symbs);
     
     return match_pattern;
 }

@@ -190,6 +190,15 @@ size_t x_strcnt(const char* restrict str, const char* restrict find)
     return count;
 }
 
+size_t x_strscnt(char** strs)
+{
+    size_t count = 0;
+    while (strs[count]) {
+        ++count;
+    }
+    return count;
+}
+
 size_t x_strmatch(const char* restrict str, char** restrict keywords, const size_t count)
 {
     for (size_t i = 0; i < count; ++i) {

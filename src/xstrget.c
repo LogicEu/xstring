@@ -2,18 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char* x_strdup_if(const char* restrict src)
-{
-    if (!src) return NULL;
-
-    const size_t size = strlen(src);
-    if (!size) return NULL;
-
-    char* buff = calloc(size + 1, sizeof(char));
-    memcpy(buff, src, size);
-    return buff;
-}
-
 static char* x_strtok_symbol(const char* restrict str, const size_t pos, const size_t len)
 {
     if (NULLSTR(str) || pos > len) return NULL;
@@ -143,42 +131,46 @@ char* x_strget_sweep(const char* restrict str)
     return sweep;
 }
 
-char* x_strget_compose(char** restrict strs, const size_t count)
+char* x_strget_compose(char** restrict strs)
 {
-    size_t total_size = 0;
-    for (size_t i = 0; i < count; ++i) {
+    size_t total_size = 0, count = 0;
+    for (size_t i = 0; strs[i]; ++i) {
         total_size += strlen(strs[i]);
+        ++count;
     }
 
     const size_t tsize = total_size;
-    if (!tsize) return NULL;
+    if (!tsize) {
+        return NULL;
+    }
+
     char* str = calloc(tsize + count + 1, sizeof(char));
 
-    bool prev = NULL, this = NULL;
+    bool prev = false, this = false;
     for (size_t i = 0; i < count; ++i) {
         this = x_strbool_alphaspace(strs[i]);
-        if (this && prev) strcat(str, " ");
+        if (this && prev) {
+            strcat(str, " ");
+        }
         strcat(str, strs[i]);
         prev = this;
     }
+
     return str;
 }
 
 /* pass string already trimmed, and NULL terminated separator */
-char** x_strget_split(const char* restrict str, size_t* size, const char* restrict ch)
+char** x_strget_split(const char* restrict str, const char* restrict ch)
 {
-    if (!size) return NULL;
     if (NULLSTR(str) || NULLSTR(ch)) {
-        *size = 0;
         return NULL;
     }
 
     const size_t count = x_strcnt(str, ch) + x_strbool_alphanum_has(str);
-    *size = count;
 
     if (!count) return NULL;
 
-    char** tokens = malloc(count * sizeof(char*));
+    char** tokens = malloc((count + 1) * sizeof(char*));
     
     const size_t chlen = strlen(ch);
     const size_t len = strlen(str);
@@ -193,8 +185,11 @@ char** x_strget_split(const char* restrict str, size_t* size, const char* restri
             
             buffer[token_char] = 0;
             token_char = 0;
-         
-            tokens[token_index++] = x_strdup_if(buffer);
+        
+            if (*buffer) {
+                tokens[token_index++] = x_strdup(buffer);
+            }
+
             memset(buffer, 0, len + 1);
             bytes = chlen;
 
@@ -206,15 +201,17 @@ char** x_strget_split(const char* restrict str, size_t* size, const char* restri
         }
     }
 
-    tokens[token_index++] = x_strdup_if(buffer);
+    if (*buffer) {
+        tokens[token_index++] = x_strdup(buffer);
+    }
+    tokens[token_index] = NULL;
+    
     return tokens;
 }
 
-char** x_strget_words(const char* restrict str, size_t* size)
+char** x_strget_words(const char* restrict str)
 {
-    if (!size) return NULL;
     if (NULLSTR(str)) {
-        *size = 0;
         return NULL;
     }
 
@@ -231,22 +228,23 @@ char** x_strget_words(const char* restrict str, size_t* size)
         }
     }
 
-    *size = count;
-    if (!count) return NULL;
+    if (!count) {
+        return NULL;
+    }
     
     const size_t cnt = count;
-    char** strs = malloc(cnt * sizeof(char*));
+    char** strs = malloc((cnt + 1) * sizeof(char*));
     for (size_t i = 0; i < cnt; ++i) {
         strs[i] = x_strtok_word(str, indexes[i], len);
     }
+    strs[cnt] = NULL;
+    
     return strs;
 }
 
-char** x_strget_deconstruct(const char* restrict str, size_t* size)
+char** x_strget_deconstruct(const char* restrict str)
 {
-    if (!size) return NULL;
     if (NULLSTR(str)) {
-        *size = 0;
         return NULL;
     }
 
@@ -264,22 +262,23 @@ char** x_strget_deconstruct(const char* restrict str, size_t* size)
         }
     }
 
-    *size = count;
-    if (!count) return NULL;
+    if (!count) {
+        return NULL;
+    }
 
     const size_t cnt = count;
-    char** strs = malloc(cnt * sizeof(char*));
+    char** strs = malloc((cnt + 1) * sizeof(char*));
     for (size_t i = 0; i < cnt; ++i) {
         strs[i] = x_strtok_symbol(str, indexes[i], len);
     }
+    strs[cnt] = NULL;
+    
     return strs;
 }
 
-char** x_strget_symbols(const char* restrict str, size_t* size)
+char** x_strget_symbols(const char* restrict str)
 {
-    if (!size) return NULL;
     if (NULLSTR(str)) {
-        *size = 0;
         return NULL;
     }
 
@@ -296,22 +295,23 @@ char** x_strget_symbols(const char* restrict str, size_t* size)
         }
     }
 
-    *size = count;
-    if (!count) return NULL;
+    if (!count) {
+        return NULL;
+    }
 
     const size_t cnt = count;
-    char** strs = malloc(cnt * sizeof(char*));
+    char** strs = malloc((cnt + 1) * sizeof(char*));
     for (size_t i = 0; i < cnt; ++i) {
         strs[i] = x_strtok_symbol(str, indexes[i], len);
     }
+    strs[cnt] = NULL;
+
     return strs;
 }
 
-char** x_strget_tokens(const char* restrict str, size_t* size)
+char** x_strget_tokens(const char* restrict str)
 {
-    if (!size) return NULL;
     if (NULLSTR(str)) {
-        *size = 0;
         return NULL;
     }
 
@@ -337,11 +337,12 @@ char** x_strget_tokens(const char* restrict str, size_t* size)
         }
     }
 
-    *size = count;
-    if (!count) return NULL;
+    if (!count) {
+        return NULL;
+    }
     
     const size_t total_count = count;
-    char** strs = malloc(total_count * sizeof(char*));
+    char** strs = malloc((total_count + 1) * sizeof(char*));
     
     for (size_t i = 0; i < total_count; ++i) {
         if (x_chrbool_alphanum(str + indexes[i])) {
@@ -350,17 +351,19 @@ char** x_strget_tokens(const char* restrict str, size_t* size)
             strs[i] = x_strtok_symbol(str, indexes[i], len);
         }
     }
+    strs[total_count] = NULL;
+
     return strs;
 }
 
-char** x_strget_variations(const char* restrict str, size_t* count)
+char** x_strget_variations(const char* restrict str)
 {
-    if (NULLSTR(str)) return NULL;
+    if (NULLSTR(str)) {
+        return NULL;
+    }
 
     const size_t variation_count = 3 * (!x_strbool_normal(str) + 1);
-
-    char** keywords = malloc(variation_count * sizeof(char*));
-    *count = variation_count;
+    char** keywords = malloc((variation_count + 1) * sizeof(char*));
     
     for (size_t i = 0; i < 3; ++i) {
         keywords[i] = x_strdup(str);
@@ -375,14 +378,13 @@ char** x_strget_variations(const char* restrict str, size_t* count)
         x_strop_normalize(keywords[i]);
     }
 
+    keywords[variation_count] = NULL;
     return keywords;
 }
 
-char** x_strget_decompose(const char* restrict str, size_t* size)
+char** x_strget_decompose(const char* restrict str)
 {
-    if (!size) return NULL;
     if (NULLSTR(str)) {
-        *size = 0;
         return NULL;
     }
 
@@ -407,11 +409,12 @@ char** x_strget_decompose(const char* restrict str, size_t* size)
         }
     }
 
-    *size = count;
-    if (!count) return NULL;
+    if (!count) {
+        return NULL;
+    }
     
     const size_t total_count = count;
-    char** strs = malloc(total_count * sizeof(char*));
+    char** strs = malloc((total_count + 1) * sizeof(char*));
 
     for (size_t i = 0; i < total_count; ++i) {
         if (x_chrbool_alphanum(str + indexes[i])) {
@@ -420,18 +423,19 @@ char** x_strget_decompose(const char* restrict str, size_t* size)
             strs[i] = x_strtok_symbol(str, indexes[i], len);
         }
     }
+    strs[total_count] = NULL;
 
     return strs;
 }
 
-/* pass matched string (returns NULL if does not match) */
-char** x_strget_divide(const char* restrict str, size_t* count, char** restrict symbols, const size_t symbol_count)
+/* pass matched string (returns NULL if does not match!!!) */
+char** x_strget_divide(const char* restrict str, char** restrict symbols)
 {
-    if (!count) return NULL;
-    *count = 0;
+    if (NULLSTR(str)) {
+        return NULL;
+    }
 
-    if (NULLSTR(str)) return NULL;
-
+    const size_t symbol_count = x_strscnt(symbols);
     char* divs[symbol_count + 1];
     char* s = (char*)(size_t)str, *mark;
     size_t index = 0;
@@ -439,40 +443,61 @@ char** x_strget_divide(const char* restrict str, size_t* count, char** restrict 
     for (size_t i = 0; i < symbol_count; ++i) {
 
         mark = strstr(s, symbols[i]);
-        if (!mark) return NULL;
+        if (!mark) {
+            for (size_t j = 0; j < index; ++j) {
+                free(divs[j]);
+            }
+            return NULL;
+        }
 
         char* div = x_strdup_range(s, mark);
-        if (div) divs[index++] = div;
+        if (div) {
+            divs[index++] = div;
+        }
         
         s = mark + strlen(symbols[i]);
     }
     
-    if (*s) divs[index++] = x_strdup(s);
+    if (*s) {
+        divs[index++] = x_strdup(s);
+    }
 
     const size_t divcount = index;
-    *count = divcount;
-    if (!divcount) return NULL;
+    if (!divcount) {
+        for (size_t i = 0; i < index; ++i) {
+            free(divs[i]);
+        }
+        return NULL;
+    }
 
-    char** divitions = malloc(divcount * sizeof(char*));
+    char** divitions = malloc((divcount + 1) * sizeof(char*));
     for (size_t i = 0; i < divcount; ++i) {
         divitions[i] = divs[i];
     }
+    divitions[divcount] = NULL;
 
     return divitions; 
 }
 
-char** x_strget_merge(char** strs1, char** strs2, const size_t count1, const size_t count2, size_t* out_count)
+char** x_strget_merge(char** strs1, char** strs2)
 {
     if (!strs1 || !strs2) return NULL;
+
+    const size_t count1 = x_strscnt(strs1);
+    const size_t count2 = x_strscnt(strs2);
     
     const size_t count = count1 + count2;
-    *out_count = count;
-    if (!count) return NULL;
+    char** strs = malloc((count + 1) * sizeof(char*));
 
-    char** strs = malloc(count * sizeof(char*));
+    for (size_t i = 0; i < count1; ++i) {
+        strs[i] = strs1[i];
+    }
 
-    for (size_t i = 0; i < count1; ++i) strs[i] = strs1[i];
-    for (size_t i = 0; i < count2; ++i) strs[i + count1] = strs2[i];
+    for (size_t i = 0; i < count2; ++i) {
+        strs[i + count1] = strs2[i];
+    }
+
+    strs[count] = NULL;
 
     free(strs1);
     free(strs2);
@@ -481,19 +506,21 @@ char** x_strget_merge(char** strs1, char** strs2, const size_t count1, const siz
 }
 
 /* pass matched collections */
-char** x_strget_group(const char* restrict str, size_t* out_size, char** restrict words, char** restrict symbols, const size_t word_count, const size_t symbol_count)
+char** x_strget_group(const char* restrict str, char** restrict words, char** restrict symbols)
 {
-    if (!out_size) return NULL;
     if (NULLSTR(str)) {
-        *out_size = 0;
         return NULL;
     }
 
-    const size_t count = word_count + symbol_count;
-    *out_size = count;
-    if (!count) return NULL;
+    const size_t word_count = x_strscnt(words);
+    const size_t symbol_count = x_strscnt(symbols);
 
-    char** unite = malloc(count * sizeof(char*));
+    const size_t count = word_count + symbol_count;
+    if (!count) {
+        return NULL;
+    }
+
+    char** unite = malloc((count + 1) * sizeof(char*));
 
     char* mark = (char*)(size_t)str;
     char* word = mark, *w;
@@ -531,14 +558,15 @@ char** x_strget_group(const char* restrict str, size_t* out_size, char** restric
         }
     }
 
+    unite[count] = NULL;
     return unite;
 }
 
-void x_strget_free(char** strs, const size_t count)
+void x_strget_free(char** strs)
 {
     if (!strs) return;
-    for (size_t i = 0; i < count; ++i) {
-        if (strs[i]) free(strs[i]);
+    for (size_t i = 0; strs[i]; ++i) {
+        free(strs[i]);
     }
     free(strs);
 }

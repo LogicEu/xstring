@@ -1,6 +1,8 @@
 #include <xstring.h>
 #include <string.h>
 
+#define eatchar(str, c, i) do {while(str[(i)] == (c)) {++(i);} --(i);} while(0)
+
 void x_strop_upper(char* str)
 {
     size_t index, bytes;
@@ -119,17 +121,27 @@ void x_strop_strip(char* str)
 {   
     const size_t size = strlen(str);
     char trimmed[size + 1];
+    memset(trimmed, 0, size + 1);
 
     size_t index = 0, bytes;
-    for (size_t i = 0; str[i] != 0; i += bytes) {
+    for (size_t i = 0; str[i]; i += bytes) {
         bytes = x_utf_bytes(str[i]);
         if (str[i] == ' ') {
             eatchar(str, ' ', i);
-            if (index && i < size - 1) trimmed[index++] = ' ';
+            if (index && i < size - 1) {
+                trimmed[index++] = ' ';
+            }
         }
         else if (str[i] == '\n') {
             eatchar(str, '\n', i);
-            if (index && i < size - 1) trimmed[index++] = '\n';
+            if (index) {
+                trimmed[index++] = '\n';
+            }
+
+            if (str[i + 1] == ' ') {
+                ++i;
+                eatchar(str, ' ', i);
+            }
         }
         else if (str[i] != '\t') {
             memcpy(trimmed + index, str + i, bytes);
@@ -137,6 +149,5 @@ void x_strop_strip(char* str)
         }
     }
     
-    trimmed[index] = 0;
     memcpy(str, trimmed, size);
 }
