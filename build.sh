@@ -30,7 +30,7 @@ dlib() {
 }
 
 slib() {
-    $cc ${flags[*]} $inc -c $src && ar -crv $name.a *.o && rm *.o
+    $cc ${flags[*]} $inc -c $src && ar -cr $name.a *.o && rm *.o
 }
 
 cleanf() {
