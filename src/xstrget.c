@@ -562,6 +562,20 @@ char** x_strget_group(const char* restrict str, char** restrict words, char** re
     return unite;
 }
 
+char** x_strget_inject(char** restrict dest, char** restrict src, const size_t index)
+{
+    const size_t destsize = x_strscnt(dest);
+    const size_t srcsize = x_strscnt(src);
+    const size_t totalsize = destsize + srcsize;
+
+    char** sum = calloc((totalsize + 1), sizeof(char*));
+    memcpy(sum, dest, index * sizeof(char*));
+    memcpy(sum + index, src, srcsize * sizeof(char*));
+    memcpy(sum + index + srcsize, dest + index, (destsize - index) * sizeof(char*));
+    sum[totalsize] = NULL;
+    return sum;
+}
+
 void x_strget_free(char** strs)
 {
     if (!strs) return;

@@ -30,6 +30,7 @@ and useful operations.
 
 bool x_strcmp(const char* str1, const char* str2);
 char* x_strend(const char* str);
+char* x_strmin(const char* astr, const char* bstr);
 char* x_strdup(const char* str);
 char* x_strdup_num(size_t num);
 char* x_strdup_range(const char* start, const char* end);
@@ -62,6 +63,7 @@ char** x_strget_decompose(const char* str);
 char** x_strget_divide(const char* str, char** symbols);
 char** x_strget_merge(char** strs1, char** strs2);
 char** x_strget_group(const char* str, char** words, char** symbols);
+char** x_strget_inject(char** dest, char** src, const size_t index);
 void x_strget_free(char** strs);
 
 /* string operatons */

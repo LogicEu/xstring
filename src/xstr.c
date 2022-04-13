@@ -87,6 +87,23 @@ char* x_strend(const char* restrict str)
     return (char*)(size_t)str + i - bytes;
 }
 
+char* x_strmin(const char* astr, const char* bstr)
+{
+    char* ret = NULL;
+    
+    if (astr && bstr) {
+        ret = astr < bstr ? (char*)(size_t)astr : (char*)(size_t)bstr;
+    } 
+    else if (bstr) {
+        ret = (char*)(size_t)bstr;
+    }
+    else if (astr) {
+        ret = (char*)(size_t)astr;
+    }
+    
+    return ret;
+}
+
 char* x_strcat(const char* restrict str1, const char* restrict str2)
 {
     if (NULLSTR(str1)) return x_strdup(str2);
