@@ -29,3 +29,6 @@ shared: $(SRC)
 
 clean: build.sh
 	./$^ $@
+
+install: build.sh
+	./$^ $@
