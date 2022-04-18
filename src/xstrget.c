@@ -166,7 +166,7 @@ char** x_strget_dup(char** strs)
         return NULL;
     }
 
-    char** ret = malloc(count + 1, sizeof(char*));
+    char** ret = malloc((count + 1) * sizeof(char*));
     for (size_t i = 0; strs[i]; ++i) {
         ret[i] = x_strdup(strs[i]);
     }
