@@ -159,6 +159,22 @@ char* x_strget_compose(char** restrict strs)
     return str;
 }
 
+char** x_strget_dup(char** strs)
+{
+    const size_t count = x_strscnt(strs);
+    if (!count) {
+        return NULL;
+    }
+
+    char** ret = malloc(count + 1, sizeof(char*));
+    for (size_t i = 0; strs[i]; ++i) {
+        ret[i] = x_strdup(strs[i]);
+    }
+    
+    ret[count] = NULL;
+    return ret;
+}
+
 /* pass string already trimmed, and NULL terminated separator */
 char** x_strget_split(const char* restrict str, const char* restrict ch)
 {

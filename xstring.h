@@ -54,6 +54,7 @@ char* x_strget_strip(const char* str);
 char* x_strget_sweep(const char* str);
 char* x_strget_compose(char** strs);
 
+char** x_strget_dup(char** strs);
 char** x_strget_split(const char* str, const char* ch);
 char** x_strget_words(const char* str);
 char** x_strget_symbols(const char* str);
