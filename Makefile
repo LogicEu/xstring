@@ -8,6 +8,8 @@ CC=gcc
 NAME=libxstring
 SRC=src/*.c
 
+SCRIPT=build.sh
+
 OS=$(shell uname -s)
 
 ifeq ($(OS),Darwin)
@@ -27,8 +29,11 @@ $(NAME).a: $(SRC)
 shared: $(SRC)
 	$(CC) -o $(LIB) $(SRC) $(CFLAGS) $(OSFLAGS)
 
-clean: build.sh
+clean: $(SCRIPT)
 	./$^ $@
 
-install: build.sh
+install: $(SCRIPT)
+	./$^ $@
+
+uninstall: $(SCRIPT)
 	./$^ $@
